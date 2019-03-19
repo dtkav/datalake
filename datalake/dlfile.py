@@ -221,14 +221,14 @@ class File(object):
         '''16-byte blake2b hash over the content of this file'''
         # this takes just under 2s on my laptop for a 1GB file.
         b2 = blake2b(digest_size=16)
-        current = self.tell()
-        self.seek(current)
+        current = self._fd.tell()
+        self._fd.seek(current)
         while True:
-            data = self.read(self._HASH_BUF_SIZE)
+            data = self._fd.read(self._HASH_BUF_SIZE)
             if not data:
                 break
             b2.update(data)
-        self.seek(current)
+        self._fd.seek(current)
         return b2.hexdigest()
 
     # bundle file version 0 is very simple. It is a tar file with three
