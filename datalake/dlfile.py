@@ -15,6 +15,8 @@
 import os
 import zlib
 from pyblake2 import blake2b
+import multihash
+import multibase
 from .translator import Translator
 from io import BytesIO
 import tarfile
@@ -219,7 +221,10 @@ class File(object):
     _HASH_BUF_SIZE = 65536
 
     def _calculate_hash(self):
-        '''16-byte blake2b hash over the content of this file'''
+        '''hash over the content of this file
+           use multihash to self-describe the hash used (blake2b-16)
+           use multibase to self-describe the encoding (b32)
+        '''
         # this takes just under 2s on my laptop for a 1GB file.
         b2 = blake2b(digest_size=16)
         current = self._fd.tell()
@@ -230,7 +235,8 @@ class File(object):
                 break
             b2.update(data)
         self._fd.seek(current)
-        return b2.hexdigest()
+        mh = multihash.encode(b2.digest(), 'blake2b-16')
+        return multibase.encode('base32', mh)
 
     # bundle file version 0 is very simple. It is a tar file with three
     # members:

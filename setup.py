@@ -30,6 +30,8 @@ setup(name='datalake',
           'python-dotenv>=0.1.3',
           'requests>=2.5',
           'six>=1.10.0',
+          'py-multibase>=1.0.1',
+          'py-multihash>=0.2.3',
       ],
       extras_require={
           'test': [
