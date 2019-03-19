@@ -13,6 +13,7 @@
 # the License.
 
 import os
+import zlib
 from pyblake2 import blake2b
 from .translator import Translator
 from io import BytesIO
@@ -338,3 +339,52 @@ class File(object):
         size = fd.tell()
         fd.seek(p, os.SEEK_SET)
         return size
+
+
+class GzippingFile(File):
+    """ Reading this file gzips it on the fly
+    """
+    #  TODO consider using https://pypi.org/project/zopfli/
+    _GZIP_COMPRESSION_LEVEL = 2
+    _GZIP_COMPRESSION_BITS = 16
+
+    def __init__(self, fd, **metadata_fields):
+        self._left = ''
+        self._compressor = zlib.compressobj(
+            self._GZIP_COMPRESSION_LEVEL,
+            zlib.DEFLATED,
+            zlib.MAX_WBITS | self._GZIP_COMPRESSION_BITS
+        )
+        super().__init__(fd, **metadata_fields)
+
+    def _initialize_methods_from_fd(self):
+        for m in ['seek', 'tell', 'close']:
+            setattr(self, m, getattr(self._fd, m))
+
+    def _read1(self, n=None):
+        while not self._left:
+            try:
+                self._left = next(self._fd)
+            except StopIteration:
+                break
+        ret = self._left[:n]
+        self._left = self._left[len(ret):]
+        return ret
+
+    def read(self, n=None):
+        l = []
+        if n is None or n < 0:
+            while True:
+                m = self._read1()
+                if not m:
+                    break
+                l.append(self._compressor.compress(m))
+        else:
+            while n > 0:
+                m = self._read1(n)
+                if not m:
+                    break
+                n -= len(m)
+                l.append(self._compressor.compress(m))
+        l.append(self._compressor.flush())
+        return b''.join(l)
