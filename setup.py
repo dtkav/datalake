@@ -12,13 +12,13 @@ def get_version():
         return versioneer.get_version()
 
 
-setup(name='datalake',
-      url='https://github.com/planetlabs/datalake',
+setup(name='datalake-dtkav',
+      url='https://github.com/dtkav/datalake',
       version=get_version(),
       cmdclass=versioneer.get_cmdclass(),
-      description='datalake: a metadata-aware archive',
-      author='Brian Cavagnolo',
-      author_email='brian@planet.com',
+      description='datalake-dtkav: a fork of planetlabs/datalake',
+      author='Daniel Grossmann-Kavanagh, Brian Cavagnolo',
+      author_email='me@danielgk.com',
       packages=find_packages(exclude=['test']),
       install_requires=[
           'boto>=2.38.0',
