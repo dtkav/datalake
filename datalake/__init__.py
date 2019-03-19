@@ -14,6 +14,7 @@
 
 from .dlfile import (
     File,
+    GzippingFile,
     StreamingFile,
     StreamingHTTPFile,
     InvalidDatalakeBundle,
