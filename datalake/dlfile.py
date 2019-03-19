@@ -195,14 +195,14 @@ class File(object):
             setattr(self, m, getattr(self._fd, m))
 
     def _infer_metadata_fields(self, metadata_fields):
-        self._infer_hash(metadata_fields)
+        self._infer_cid(metadata_fields)
         self._infer_where(metadata_fields)
         self._apply_translations(metadata_fields)
 
-    def _infer_hash(self, metadata_fields):
-        if 'hash' not in metadata_fields:
+    def _infer_cid(self, metadata_fields):
+        if 'cid' not in metadata_fields:
             # do not recalculate the hash if it is already known
-            metadata_fields['hash'] = self._calculate_hash()
+            metadata_fields['cid'] = self._calculate_cid()
 
     def _infer_where(self, metadata_fields):
         default_where = os.environ.get('DATALAKE_DEFAULT_WHERE')
@@ -220,7 +220,7 @@ class File(object):
 
     _HASH_BUF_SIZE = 65536
 
-    def _calculate_hash(self):
+    def _calculate_cid(self):
         '''hash over the content of this file
            use multihash to self-describe the hash used (blake2b-16)
            use multibase to self-describe the encoding (b32)
