@@ -236,7 +236,7 @@ class File(object):
             b2.update(data)
         self._fd.seek(current)
         mh = multihash.encode(b2.digest(), 'blake2b-16')
-        return multibase.encode('base32', mh)
+        return multibase.encode('base32', mh).decode("utf-8")
 
     # bundle file version 0 is very simple. It is a tar file with three
     # members:
